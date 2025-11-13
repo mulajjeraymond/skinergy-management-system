@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skinergy Cosmetics Management</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- jsPDF CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(120deg, #ffe6f0, #fff0f5);
+    }
+    .navbar-custom {
+      background-color: #ff69b4;
+    }
+    .navbar-custom .nav-link, .navbar-custom .navbar-brand {
+      color: white;
+    }
+    .navbar-custom .nav-link:hover {
+      color: #ffb6c1;
+    }
+    .card {
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .btn-pink {
+      background-color: #ff69b4;
+      color: white;
+    }
+    .btn-pink:hover {
+      background-color: #ff1493;
+      color: white;
+    }
+    table th, table td {
+      vertical-align: middle !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-custom mb-4">
+    <div class="container">
+      <a class="navbar-brand" href="#">Skinergy</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('dashboard')">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('rawMaterials')">Raw Materials</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('products')">Finished Products</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('sales')">Sales</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('reports')">Reports</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="card p-4 mb-4">
+      <h2 class="text-pink">Dashboard Overview</h2>
+      <div class="row text-center mt-3">
+        <div class="col-md-3 mb-3">
+          <div class="card p-3 bg-light">Total Raw Material Value: <span id="totalMaterialValue">0</span></div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="card p-3 bg-light">Total Products Value: <span id="totalProductValue">0</span></div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="card p-3 bg-light">Total Sales: <span id="totalSales">0</span></div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="card p-3 bg-light">Total Profit: <span id="totalProfit">0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Raw Materials -->
+    <div id="rawMaterials" class="card p-4 mb-4" style="display:none;">
+      <h2 class="text-pink mb-3">Raw Materials</h2>
+      <div class="row g-2 mb-3">
+        <div class="col-md-2"><input type="text" id="materialName" class="form-control" placeholder="Name"></div>
+        <div class="col-md-2"><input type="number" id="materialQty" class="form-control" placeholder="Qty"></div>
+        <div class="col-md-2"><input type="text" id="materialUnit" class="form-control" placeholder="Unit"></div>
+        <div class="col-md-2"><input type="number" id="materialPrice" class="form-control" placeholder="Unit Price"></div>
+        <div class="col-md-2"><input type="text" id="materialSupplier" class="form-control" placeholder="Supplier"></div>
+        <div class="col-md-2"><button class="btn btn-pink w-100" onclick="addMaterial()">Add Material</button></div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+          <thead class="table-pink">
+            <tr>
+              <th>Name</th><th>Qty</th><th>Unit</th><th>Unit Price</th><th>Supplier</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="materialTable"></tbody>
+        </table>
+      </div>
+      <p>Total Material Value: <span id="materialValue">0</span></p>
+    </div>
+
+    <!-- Finished Products -->
+    <div id="products" class="card p-4 mb-4" style="display:none;">
+      <h2 class="text-pink mb-3">Finished Products</h2>
+      <div class="row g-2 mb-3">
+        <div class="col-md-3"><input type="text" id="productName" class="form-control" placeholder="Product Name"></div>
+        <div class="col-md-2"><input type="number" id="productQty" class="form-control" placeholder="Qty"></div>
+        <div class="col-md-2"><input type="number" id="productCost" class="form-control" placeholder="Cost"></div>
+        <div class="col-md-2"><input type="number" id="productPrice" class="form-control" placeholder="Selling Price"></div>
+        <div class="col-md-3"><button class="btn btn-pink w-100" onclick="addProduct()">Add Product</button></div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+          <thead class="table-pink">
+            <tr><th>Name</th><th>Qty</th><th>Cost</th><th>Selling Price</th><th>Profit</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="productTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Sales -->
+    <div id="sales" class="card p-4 mb-4" style="display:none;">
+      <h2 class="text-pink mb-3">Sales</h2>
+      <div class="row g-2 mb-3">
+        <div class="col-md-3"><input type="text" id="customerName" class="form-control" placeholder="Customer Name"></div>
+        <div class="col-md-3"><select id="saleProduct" class="form-select"></select></div>
+        <div class="col-md-2"><input type="number" id="saleQty" class="form-control" placeholder="Qty Sold"></div>
+        <div class="col-md-2"><button class="btn btn-pink w-100" onclick="addSale()">Record Sale</button></div>
+        <div class="col-md-2"><button class="btn btn-secondary w-100" onclick="printSalesReceipt()">Print Receipt</button></div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+          <thead class="table-pink">
+            <tr><th>Customer</th><th>Product</th><th>Qty</th><th>Total Price</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="salesTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Reports -->
+    <div id="reports" class="card p-4 mb-4" style="display:none;">
+      <h2 class="text-pink mb-3">Reports</h2>
+      <canvas id="reportChart" height="150"></canvas>
+      <button class="btn btn-pink mt-3" onclick="exportReportPDF()">Export PDF</button>
+    </div>
+
+  </div>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Show/Hide Sections
+    function showSection(sectionId) {
+      const sections = ['dashboard','rawMaterials','products','sales','reports'];
+      sections.forEach(s => document.getElementById(s).style.display = 'none');
+      document.getElementById(sectionId).style.display = 'block';
+      updateDashboard();
+      populateProductsDropdown();
+      renderReports();
+    }
+
+    // LocalStorage Data
+    let materials = JSON.parse(localStorage.getItem('materials')) || [];
+    let products = JSON.parse(localStorage.getItem('products')) || [];
+    let sales = JSON.parse(localStorage.getItem('sales')) || [];
+
+    // Raw Materials
+    function addMaterial() {
+      const name = document.getElementById('materialName').value;
+      const qty = parseFloat(document.getElementById('materialQty').value);
+      const unit = document.getElementById('materialUnit').value;
+      const price = parseFloat(document.getElementById('materialPrice').value);
+      const supplier = document.getElementById('materialSupplier').value;
+      if(name && qty && unit && price && supplier) {
+        materials.push({name, qty, unit, price, supplier});
+        localStorage.setItem('materials', JSON.stringify(materials));
+        document.getElementById('materialName').value='';
+        document.getElementById('materialQty').value='';
+        document.getElementById('materialUnit').value='';
+        document.getElementById('materialPrice').value='';
+        document.getElementById('materialSupplier').value='';
+        renderMaterials();
+        updateDashboard();
+      }
+    }
+
+    function renderMaterials() {
+      const tbody = document.getElementById('materialTable');
+      tbody.innerHTML = '';
+      let total = 0;
+      materials.forEach((m,i)=>{
+        total += m.qty * m.price;
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${m.name}</td><td>${m.qty}</td><td>${m.unit}</td><td>${m.price}</td><td>${m.supplier}</td>
+                         <td><button class="btn btn-sm btn-danger" onclick="deleteMaterial(${i})">Delete</button></td>`;
+        tbody.appendChild(row);
+      });
+      document.getElementById('materialValue').innerText = total;
+    }
+
+    function deleteMaterial(index) {
+      if(confirm('Delete this material?')){
+        materials.splice(index,1);
+        localStorage.setItem('materials', JSON.stringify(materials));
+        renderMaterials();
+        updateDashboard();
+      }
+    }
+
+    // Finished Products
+    function addProduct() {
+      const name = document.getElementById('productName').value;
+      const qty = parseFloat(document.getElementById('productQty').value);
+      const cost = parseFloat(document.getElementById('productCost').value);
+      const price = parseFloat(document.getElementById('productPrice').value);
+      if(name && qty && cost && price){
+        products.push({name, qty, cost, price});
+        localStorage.setItem('products', JSON.stringify(products));
+        document.getElementById('productName').value='';
+        document.getElementById('productQty').value='';
+        document.getElementById('productCost').value='';
+        document.getElementById('productPrice').value='';
+        renderProducts();
+        updateDashboard();
+      }
+    }
+
+    function renderProducts() {
+      const tbody = document.getElementById('productTable');
+      tbody.innerHTML = '';
+      products.forEach((p,i)=>{
+        const profit = p.price - p.cost;
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${p.name}</td><td>${p.qty}</td><td>${p.cost}</td><td>${p.price}</td><td>${profit}</td>
+                         <td><button class="btn btn-sm btn-danger" onclick="deleteProduct(${i})">Delete</button></td>`;
+        tbody.appendChild(row);
+      });
+    }
+
+    function deleteProduct(index){
+      if(confirm('Delete this product?')){
+        products.splice(index,1);
+        localStorage.setItem('products', JSON.stringify(products));
+        renderProducts();
+        updateDashboard();
+      }
+    }
+
+    // Sales
+    function populateProductsDropdown() {
+      const select = document.getElementById('saleProduct');
+      select.innerHTML = '';
+      products.forEach((p,i)=>{
+        const option = document.createElement('option');
+        option.value = i;
+        option.text = p.name;
+        select.appendChild(option);
+      });
+    }
+
+    function addSale(){
+      const customer = document.getElementById('customerName').value;
+      const productIndex = document.getElementById('saleProduct').value;
+      const qty = parseFloat(document.getElementById('saleQty').value);
+      if(customer && productIndex !== null && qty){
+        const product = products[productIndex];
+        const total = qty * product.price;
+        sales.push({customer, product: product.name, qty, total});
+        localStorage.setItem('sales', JSON.stringify(sales));
+        document.getElementById('customerName').value='';
+        document.getElementById('saleQty').value='';
+        renderSales();
+        updateDashboard();
+      }
+    }
+
+    function renderSales(){
+      const tbody = document.getElementById('salesTable');
+      tbody.innerHTML='';
+      sales.forEach((s,i)=>{
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${s.customer}</td><td>${s.product}</td><td>${s.qty}</td><td>${s.total}</td>
+                         <td><button class="btn btn-sm btn-danger" onclick="deleteSale(${i})">Delete</button></td>`;
+        tbody.appendChild(row);
+      });
+    }
+
+    function deleteSale(index){
+      if(confirm('Delete this sale?')){
+        sales.splice(index,1);
+        localStorage.setItem('sales', JSON.stringify(sales));
+        renderSales();
+        updateDashboard();
+      }
+    }
+
+    function printSalesReceipt(){
+      let content = '<h2 style="color:#ff69b4;">Skinergy Receipt</h2>';
+      content += `<p>Date: ${new Date().toLocaleDateString()}</p>`;
+      sales.forEach(s=>{
+        content += `<p>${s.customer} bought ${s.qty} ${s.product} - $${s.total}</p>`;
+      });
+      const printWindow = window.open('', '', 'height=600,width=800');
+      printWindow.document.write('<html><head><title>Receipt</title></head><body>'+content+'</body></html>');
+      printWindow.document.close();
+      printWindow.print();
+    }
+
+    // Dashboard
+    function updateDashboard(){
+      const totalMaterial = materials.reduce((a,b)=>a+b.qty*b.price,0);
+      const totalProduct = products.reduce((a,b)=>a+b.qty*b.cost,0);
+      const totalSalesValue = sales.reduce((a,b)=>a+b.total,0);
+      const totalProfit = sales.reduce((a,b)=>{
+        const product = products.find(p=>p.name===b.product);
+        return a + (b.qty*(product.price - product.cost));
+      },0);
+
+      document.getElementById('totalMaterialValue').innerText = totalMaterial;
+      document.getElementById('totalProductValue').innerText = totalProduct;
+      document.getElementById('totalSales').innerText = totalSalesValue;
+      document.getElementById('totalProfit').innerText = totalProfit;
+    }
+
+    // Reports
+    function renderReports(){
+      const ctx = document.getElementById('reportChart').getContext('2d');
+      const totalMaterial = materials.reduce((a,b)=>a+b.qty*b.price,0);
+      const totalProduct = products.reduce((a,b)=>a+b.qty*b.cost,0);
+      const totalSalesValue = sales.reduce((a,b)=>a+b.total,0);
+      const totalProfit = sales.reduce((a,b)=>{
+        const product = products.find(p=>p.name===b.product);
+        return a + (b.qty*(product.price - product.cost));
+      },0);
+
+      if(window.reportChart) window.reportChart.destroy();
+      window.reportChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Raw Materials','Products','Sales','Profit'],
+          datasets:[{
+            label: 'Amount ($)',
+            data: [totalMaterial,totalProduct,totalSalesValue,totalProfit],
+            backgroundColor: ['#ff69b4','#ff85c1','#ff1493','#ffb6c1']
+          }]
+        }
+      });
+    }
+
+    function exportReportPDF(){
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("Skinergy Reports", 20, 20);
+      const totalMaterial = materials.reduce((a,b)=>a+b.qty*b.price,0);
+      const totalProduct = products.reduce((a,b)=>a+b.qty*b.cost,0);
+      const totalSalesValue = sales.reduce((a,b)=>a+b.total,0);
+      const totalProfit = sales.reduce((a,b)=>{
+        const product = products.find(p=>p.name===b.product);
+        return a + (b.qty*(product.price - product.cost));
+      },0);
+      doc.text(`Total Raw Material Value: $${totalMaterial}`,20,40);
+      doc.text(`Total Products Value: $${totalProduct}`,20,50);
+      doc.text(`Total Sales: $${totalSalesValue}`,20,60);
+      doc.text(`Total Profit: $${totalProfit}`,20,70);
+      doc.save("Skinergy_Report.pdf");
+    }
+
+    // Initial Rendering
+    renderMaterials();
+    renderProducts();
+    renderSales();
+    updateDashboard();
+    populateProductsDropdown();
+  </script>
+</body>
+</html>
